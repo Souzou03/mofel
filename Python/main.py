@@ -7,14 +7,10 @@ from eff_word_net.audio_processing import Resnet50_Arc_loss
 from hotword_detector import HotwordDetector
 from multi_hotword_detector import MultiHotwordDetector
 
-def main():
-    """
-    メインの実行関数
-    """
+
+def wakeup():
     # 共通のベースモデルを定義
     base_model = Resnet50_Arc_loss()
-
-    # 各ホットワードのDetectorを初期化
     mofel = HotwordDetector(
         hotword="mofel",
         model=base_model,
@@ -22,7 +18,6 @@ def main():
         threshold=0.7,
         relaxation_time=2
     )
-
     stop = HotwordDetector(
         hotword="stop",
         model=base_model,
@@ -30,22 +25,18 @@ def main():
         threshold=0.7,
         relaxation_time=2
     )
-
-    # 複数のDetectorをまとめる
     multi_hotword_detector = MultiHotwordDetector(
         detector_collection=[mofel, stop],
         model=base_model,
         continuous=True,
     )
-
-    # マイクストリームの準備
     mic_stream = SimpleMicStream(
         window_length_secs=1.5, 
         sliding_window_secs=0.75
     )
     mic_stream.start_stream()
 
-    print("Say:", " / ".join([d.hotword for d in multi_hotword_detector.detector_collection]))
+    print("ウェイクアップワード検出中:", " / ".join([d.hotword for d in multi_hotword_detector.detector_collection]))
 
     # 検出ループ
     while True:
@@ -56,12 +47,17 @@ def main():
         # detectorがNoneでない場合（＝閾値を超える検出があった場合）に結果を表示
         if detector is not None:
             print(f"Detected: {detector.hotword}, Confidence: {score:.4f}")
+            return detector.hotword
+
 
 if __name__ == "__main__":
-    # 前提条件のチェック
-    if not (os.path.exists("./mofel/model/mofel_ref.json") and os.path.exists("./stop/model/stop_ref.json")):
-        print("エラー: 参照ファイル 'mofel_ref.json' または 'stop_ref.json' が見つかりません。")
-        print("正しいディレクトリ構造で配置してください。")
-    else:
-        main()
+    while True:
+        try:
+            hotword = wakeup()
+            print(f"ウェイクアップワード '{hotword}' が検出されました。")
+        except KeyboardInterrupt:
+            print("プログラムを終了します。")
+            break
+        except Exception as e:
+            print(f"エラーが発生しました: {e}")
 
