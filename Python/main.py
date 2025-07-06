@@ -7,6 +7,10 @@ from multi_hotword_detector import MultiHotwordDetector
 
 import speech_to_text
 
+genai.configure(api_key=os.getenv("GEMINI_API"))
+model = genai.GenerativeModel("gemini-2.0-flash")
+chat = model.start_chat(history=[])
+
 
 def wakeup():
 #　ウェイクアップワード用のモデルと検出
@@ -57,9 +61,11 @@ if __name__ == "__main__":
             print(f"ウェイクアップワード '{hotword}' が検出されました。")
             if(hotword == "mofel"):
                 print("音声認識を開始します...")
-                text = speech_to_text.listen()
-                if text:
-                    print(f"認識結果: {text}")
+                user_text = speech_to_text.listen()
+                if user_text:
+                    print(f"ユーザー: {user_text}")
+                    gemini_response = chat.send_message(user_text)
+                    print("Gemini:", gemini_response.text)
         except KeyboardInterrupt:
             print("プログラムを終了します。")
             break
