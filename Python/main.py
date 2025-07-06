@@ -67,6 +67,7 @@ if __name__ == "__main__":
                     print(f"ユーザー: {user_text}")
                     gemini_response = chat.send_message(user_text)
                     print("Gemini:", gemini_response.text)
+                    os.system("./../jtalk.sh \"" + gemini_response.text + "\"")
         except KeyboardInterrupt:
             print("プログラムを終了します。")
             break
