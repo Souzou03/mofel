@@ -1,5 +1,3 @@
-# main.py
-
 import os
 from eff_word_net.streams import SimpleMicStream
 from eff_word_net.audio_processing import Resnet50_Arc_loss
@@ -7,9 +5,11 @@ from eff_word_net.audio_processing import Resnet50_Arc_loss
 from hotword_detector import HotwordDetector
 from multi_hotword_detector import MultiHotwordDetector
 
+import speech_to_text
+
 
 def wakeup():
-    # 共通のベースモデルを定義
+#　ウェイクアップワード用のモデルと検出
     base_model = Resnet50_Arc_loss()
     mofel = HotwordDetector(
         hotword="mofel",
@@ -35,7 +35,7 @@ def wakeup():
         sliding_window_secs=0.75
     )
     mic_stream.start_stream()
-
+# ================================================
     print("ウェイクアップワード検出中:", " / ".join([d.hotword for d in multi_hotword_detector.detector_collection]))
 
     # 検出ループ
@@ -55,6 +55,11 @@ if __name__ == "__main__":
         try:
             hotword = wakeup()
             print(f"ウェイクアップワード '{hotword}' が検出されました。")
+            if(hotword == "mofel"):
+                print("音声認識を開始します...")
+                text = speech_to_text.listen()
+                if text:
+                    print(f"認識結果: {text}")
         except KeyboardInterrupt:
             print("プログラムを終了します。")
             break
