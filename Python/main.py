@@ -1,4 +1,5 @@
 import os
+import google.generativeai as genai
 from eff_word_net.streams import SimpleMicStream
 from eff_word_net.audio_processing import Resnet50_Arc_loss
 
