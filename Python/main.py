@@ -60,6 +60,7 @@ if __name__ == "__main__":
         try:
             hotword = wakeup()
             print(f"ウェイクアップワード '{hotword}' が検出されました。")
+            os.system("aplay --quiet ./first_response.wav")
             if(hotword == "mofel"):
                 print("音声認識を開始します...")
                 user_text = speech_to_text.listen()
@@ -67,7 +68,7 @@ if __name__ == "__main__":
                     print(f"ユーザー: {user_text}")
                     gemini_response = chat.send_message(user_text)
                     print("Gemini:", gemini_response.text)
-                    os.system("./../jtalk/jtalk.sh \"" + gemini_response.text + "\"")
+                    os.system("./jtalk.sh \"" + gemini_response.text + "\"")
         except KeyboardInterrupt:
             print("プログラムを終了します。")
             break
