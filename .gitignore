@@ -2,3 +2,6 @@
 *.deb
 *.txt
 *MMD*
+.python-version
+*.wav
+*__pycache__
